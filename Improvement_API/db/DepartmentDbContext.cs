@@ -17,6 +17,8 @@ public partial class DepartmentDbContext : DbContext
 
     public virtual DbSet<Report> Report { get; set; }
 
+    public virtual DbSet<Role> Role { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +35,21 @@ public partial class DepartmentDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade)
                   .HasConstraintName("FK_Reports_Users");
         });
+
+      /* modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.id_Role);
+
+            entity.Property(e => e.id_Role).HasColumnName("id_Role");
+
+            entity.HasMany(u => u.Users)
+                 .WithOne(r => r.id_RoleNavigation)
+                 .HasForeignKey(r => r.id_Role)
+                 .OnDelete(DeleteBehavior.Cascade)
+                 .HasConstraintName("FK_Roles_Users");
+        }); */
+
+
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -54,7 +71,7 @@ public partial class DepartmentDbContext : DbContext
                  .WithMany(p => p.Users)
                  .HasForeignKey(d => d.id_Role)
                  .OnDelete(DeleteBehavior.Cascade)
-                 .HasConstraintName("FK_Reports_Users");
+                 .HasConstraintName("FK_Roles_Users");
         });
     }
 

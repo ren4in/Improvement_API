@@ -9,6 +9,7 @@ using Improvement_API.db;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace Improvement_API.Controllers
 {
@@ -27,7 +28,7 @@ namespace Improvement_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.User.ToListAsync();
+            return await _context.User.Include(u=>u.id_RoleNavigation).ToListAsync();
         }
 
         // GET: api/Users/5
@@ -55,6 +56,8 @@ namespace Improvement_API.Controllers
                 return BadRequest();
             }
 
+            user.Password = Hash.HashPassword(user.Password);
+
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -81,6 +84,7 @@ namespace Improvement_API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            user.Password=Hash.HashPassword(user.Password);
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
@@ -135,27 +139,29 @@ namespace Improvement_API.Controllers
             return new JsonResult(response);
         }
 
-        private ClaimsIdentity GetIdentity(string Login, string Password)
+        private ClaimsIdentity GetIdentity(string login, string password)
         {
-            User user = _context.User.Include(r => r.id_RoleNavigation).FirstOrDefault(x => x.Login == Login && x.Password == Password);
-            if (user != null)
+            User user = _context.User.Include(u => u.id_RoleNavigation)
+                            .FirstOrDefault(u => u.Login == login);
+
+            if (user != null && Hash.VerifyHashedPassword(user.Password, password))
             {
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, user.id_RoleNavigation.Name),
                     new Claim("id_User", user.id_User.ToString()) // Добавляем Claim с идентификатором пользователя
                 };
+
                 ClaimsIdentity claimsIdentity =
-                new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
-                    ClaimsIdentity.DefaultRoleClaimType);
+                    new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                        ClaimsIdentity.DefaultRoleClaimType);
+
                 return claimsIdentity;
             }
 
-            // если пользователя не найдено
+            // Если пользователь не найден или пароль не совпадает, возвращаем null
             return null;
-
 
         }
             private bool UserExists(int id)

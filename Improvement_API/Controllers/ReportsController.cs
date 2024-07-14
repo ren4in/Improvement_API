@@ -27,6 +27,15 @@ namespace Improvement_API.Controllers
             return await _context.Report.Include(r=>r.id_UserNavigation).ToListAsync();
         }
 
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<IEnumerable<Report>>> GetReportsByUser(int id)
+        {
+            return await _context.Report
+                .Include(r => r.id_UserNavigation)
+                .Where(r => r.id_User == id)
+                .ToListAsync();
+        }
+
         // GET: api/Reports/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Report>> GetReport(int id)
@@ -83,6 +92,37 @@ namespace Improvement_API.Controllers
             return CreatedAtAction("GetReport", new { id = report.id_Report }, report);
         }
 
+        [HttpPost("ToggleAccepted/{id_Report}")]
+        public async Task<IActionResult> ToggleAccepted(int id_Report)
+        {
+            var report = await _context.Report.FindAsync(id_Report);
+
+            if (report == null)
+            {
+                return NotFound();
+            }
+
+            // Изменяем значение Accepted на противоположное
+            report.Accepted = !report.Accepted;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ReportExists(id_Report))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
         // DELETE: api/Reports/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReport(int id)
