@@ -26,7 +26,9 @@ namespace Improvement_API.db
         [JsonIgnore]
         public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
-        
+        [JsonIgnore]
+        public virtual ICollection<Point> Points { get; set; } = new List<Point>();
+
         public virtual Role? id_RoleNavigation { get; set; } = null!;
 
 
