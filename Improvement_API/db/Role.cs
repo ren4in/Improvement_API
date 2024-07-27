@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Improvement_API.db
+namespace Improvement_API
 {
     public class Role
     {

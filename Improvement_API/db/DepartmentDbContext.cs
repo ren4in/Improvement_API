@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Improvement_API.db;
 using Improvement_API;
-namespace Improvement_API.db;
+namespace Improvement_API;
 
-using Improvement_API.db;
- using Microsoft.EntityFrameworkCore;
+
+using Microsoft.EntityFrameworkCore;
 
 
 public partial class DepartmentDbContext : DbContext
@@ -34,16 +33,16 @@ public partial class DepartmentDbContext : DbContext
             entity.Property(e => e.id_Report).HasColumnName("id_Report");
             entity.Property(e => e.Manager_Comment).HasColumnType("text");
 
-            entity.HasOne(d => d.id_UserNavigation)
+            entity.HasOne(d => d.id_OrderNavigation)
                   .WithMany(p => p.Reports)
-                  .HasForeignKey(d => d.id_User)
+                  .HasForeignKey(d => d.id_Order)
                   .OnDelete(DeleteBehavior.Cascade)
-                  .HasConstraintName("FK_Reports_Users");
+                  .HasConstraintName("FK_Reports_Orders");
         });
-
 
         modelBuilder.Entity<Line>(entity =>
         {
+
             entity.HasKey(e => e.id_Line);
 
             entity.Property(e => e.id_Line).HasColumnName("id_Line");
@@ -51,16 +50,15 @@ public partial class DepartmentDbContext : DbContext
             entity.HasOne(d => d.id_Point1Navigation)
                   .WithMany(p => p.Lines1)
                   .HasForeignKey(d => d.id_Point1)
-                  .OnDelete(DeleteBehavior.NoAction)
+                  .OnDelete(DeleteBehavior.Cascade)
                   .HasConstraintName("FK_Lines_Points1");
 
             entity.HasOne(d => d.id_Point2Navigation)
                   .WithMany(p => p.Lines2)
                   .HasForeignKey(d => d.id_Point2)
-                  .OnDelete(DeleteBehavior.NoAction)
+                  .OnDelete(DeleteBehavior.Cascade)
                   .HasConstraintName("FK_Lines_Points2");
         });
-
 
         modelBuilder.Entity<Role>(entity =>
         {
@@ -71,7 +69,7 @@ public partial class DepartmentDbContext : DbContext
             entity.HasMany(u => u.Users)
                  .WithOne(r => r.id_RoleNavigation)
                  .HasForeignKey(r => r.id_Role)
-                 .OnDelete(DeleteBehavior.Restrict)
+                 .OnDelete(DeleteBehavior.Cascade)
                  .HasConstraintName("FK_Roles_Users");
         });
 
@@ -93,6 +91,29 @@ public partial class DepartmentDbContext : DbContext
        .HasForeignKey(d => d.id_User)
        .OnDelete(DeleteBehavior.Cascade)
        .HasConstraintName("FK_Users_Points");
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.id_Order);
+
+
+            entity.HasMany(u => u.Reports)
+                 .WithOne(r => r.id_OrderNavigation)
+                 .HasForeignKey(r => r.id_Order)
+                 .OnDelete(DeleteBehavior.Cascade)
+                 .HasConstraintName("FK_Orders_Reports");
+
+            entity.HasOne(d => d.id_ExecutorNavigation)
+       .WithMany(p => p.Orders1)
+       .HasForeignKey(d => d.id_Executor)
+       .OnDelete(DeleteBehavior.Cascade)
+       .HasConstraintName("FK_Orders_Users1");
+            entity.HasOne(d => d.id_SupervisorNavigation)
+    .WithMany(p => p.Orders2)
+    .HasForeignKey(d => d.id_Supervisor)
+    .OnDelete(DeleteBehavior.Cascade)
+    .HasConstraintName("FK_Orders_Users2");
         });
         modelBuilder.Entity<Point_Image>(entity =>
         {
@@ -119,11 +140,16 @@ public partial class DepartmentDbContext : DbContext
             entity.Property(e => e.Login).HasColumnName("Login");
             entity.Property(e => e.Password).HasColumnName("Password");
 
-            entity.HasMany(u => u.Reports)
-                  .WithOne(r => r.id_UserNavigation)
-                  .HasForeignKey(r => r.id_User)
+            entity.HasMany(u => u.Orders1)
+                  .WithOne(r => r.id_ExecutorNavigation)
+                  .HasForeignKey(r => r.id_Executor)
                   .OnDelete(DeleteBehavior.Cascade)
-                  .HasConstraintName("FK_Reports_Users");
+                  .HasConstraintName("FK_Order_Users1");
+            entity.HasMany(u => u.Orders2)
+                  .WithOne(r => r.id_SupervisorNavigation)
+                  .HasForeignKey(r => r.id_Supervisor)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_Order_Users2");
             entity.HasMany(u => u.Points)
                   .WithOne(r => r.id_UserNavigation)
                   .HasForeignKey(r => r.id_User)
@@ -136,11 +162,12 @@ public partial class DepartmentDbContext : DbContext
                  .HasConstraintName("FK_Roles_Users");
         });
     }
+    public DbSet<Line> Line { get; set; } = default!;
 
-public DbSet<Improvement_API.db.Point> Point { get; set; } = default!;
+    public DbSet<Point> Point { get; set; } = default!;
 
-public DbSet<Improvement_API.db.Point_Image> Point_Image { get; set; } = default!;
+    public DbSet<Point_Image> Point_Image { get; set; } = default!;
 
-public DbSet<Improvement_API.Line> Line { get; set; } = default!;
+public DbSet<Improvement_API.Order> Order { get; set; } = default!;
 
 }

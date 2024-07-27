@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Improvement_API.db;
 using Microsoft.Data.SqlClient;
 
 namespace Improvement_API.Controllers

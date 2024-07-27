@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Improvement_API.db;
+
 
 namespace Improvement_API.Controllers
 {
@@ -24,15 +24,15 @@ namespace Improvement_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Report>>> GetReport()
         {
-            return await _context.Report.Include(r=>r.id_UserNavigation).ToListAsync();
+            return await _context.Report.Include(r=>r.id_OrderNavigation).ToListAsync();
         }
 
         [HttpGet("user/{id}")]
         public async Task<ActionResult<IEnumerable<Report>>> GetReportsByUser(int id)
         {
             return await _context.Report
-                .Include(r => r.id_UserNavigation)
-                .Where(r => r.id_User == id)
+                .Include(r => r.id_OrderNavigation)
+                .Where(r => r.id_OrderNavigation.id_Executor == id)
                 .ToListAsync();
         }
 
@@ -80,6 +80,18 @@ namespace Improvement_API.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("order/{id}")]
+        public async Task<ActionResult<IEnumerable<Report>>> GetReportsByOrder(int id)
+        {
+            return await _context.Report
+                .Include(r => r.id_OrderNavigation)
+
+                .Where(r => r.id_Order == id)
+                .ToListAsync();
+        }
+
+
 
         // POST: api/Reports
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

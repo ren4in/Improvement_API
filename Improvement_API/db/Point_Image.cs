@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Improvement_API.db
+namespace Improvement_API
 {
     public partial class Point_Image
     {

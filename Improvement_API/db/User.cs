@@ -2,7 +2,7 @@
 using System.Data;
 using System.Text.Json.Serialization;
 
-namespace Improvement_API.db
+namespace Improvement_API
 {
 
     public partial class User
@@ -24,10 +24,14 @@ namespace Improvement_API.db
 
         public string? Password { get; set; } = null!;
         [JsonIgnore]
-        public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
-
+        public virtual ICollection<Order> Orders1 { get; set; } = new List<Order>();
         [JsonIgnore]
+
+        public virtual ICollection<Order> Orders2 { get; set; } = new List<Order>();
+
         public virtual ICollection<Point> Points { get; set; } = new List<Point>();
+
+
 
         public virtual Role? id_RoleNavigation { get; set; } = null!;
 

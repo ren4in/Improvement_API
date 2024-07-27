@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Improvement_API.db;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +29,8 @@ namespace Improvement_API.Controllers
         {
             return await _context.User.Include(u=>u.id_RoleNavigation).ToListAsync();
         }
+
+
 
         // GET: api/Users/5
         [HttpGet("{id}")]

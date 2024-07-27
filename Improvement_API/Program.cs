@@ -1,4 +1,4 @@
-using Improvement_API.db;
+using Improvement_API;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

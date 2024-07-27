@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Improvement_API;
-using Improvement_API.db;
+ 
 
 namespace Improvement_API.Controllers
 {
@@ -25,6 +24,7 @@ namespace Improvement_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Line>>> GetLine()
         {
+
             return await _context.Line.Include(p=>p.id_Point1Navigation).Include(p=>p.id_Point2Navigation).ToListAsync();
         }
 

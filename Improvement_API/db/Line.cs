@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using Improvement_API.db;
-using Point = Improvement_API.db.Point;
+using Point = Improvement_API.Point;
 namespace Improvement_API
 {
 

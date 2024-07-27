@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using Improvement_API.db;
+
 using Improvement_API;
 
 
-namespace Improvement_API.db
+namespace Improvement_API
 {
     public partial class Point
     {
