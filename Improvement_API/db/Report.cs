@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Text.Json.Serialization;
 
@@ -18,6 +19,8 @@ namespace Improvement_API
         public string? Header { get; set; }
 
         public virtual Order? id_OrderNavigation { get; set; } = null!;
+        [JsonIgnore]
+        public virtual ICollection<Report_Image> Images { get; set; } = new List<Report_Image>();
 
 
 
