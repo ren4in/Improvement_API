@@ -30,6 +30,40 @@ namespace Improvement_API.Controllers
                 .Where(r => r.id_Executor == id)
                 .ToListAsync();
         }
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Report>>> SearchOrders(int? id_User, string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                return BadRequest("Search text cannot be empty");
+            }
+
+            // Преобразуем поисковый текст в нижний регистр, чтобы поиск был регистронезависимым
+            searchText = searchText.ToLower();
+
+            var matchedOrders = await _context.Order
+                .Include(r => r.id_ExecutorNavigation).Include(r => r.id_SupervisorNavigation)
+               .Where(r =>
+            r.id_Executor == id_User &&
+            (
+                r.Text.ToLower().Contains(searchText) ||
+                (r.id_SupervisorNavigation.FirstName.ToLower() + " " +
+                 r.id_SupervisorNavigation.MiddleName.ToLower() + " " +
+                 r.id_SupervisorNavigation.LastName.ToLower()).Contains(searchText) ||
+                r.Header.ToLower().Contains(searchText)
+            )
+        )
+        .ToListAsync();
+
+            if (matchedOrders == null || !matchedOrders.Any())
+            {
+                return NotFound("No orders found matching the search criteria");
+            }
+ 
+
+            return Ok(matchedOrders);
+        }
+
 
 
 

@@ -24,14 +24,14 @@ namespace Improvement_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Report>>> GetReport()
         {
-            return await _context.Report.Include(r=>r.id_OrderNavigation).ToListAsync();
+            return await _context.Report.Include(r=>r.id_OrderNavigation.id_ExecutorNavigation).ToListAsync();
         }
 
         [HttpGet("user/{id}")]
         public async Task<ActionResult<IEnumerable<Report>>> GetReportsByUser(int id)
         {
             return await _context.Report
-                .Include(r => r.id_OrderNavigation)
+                .Include(r => r.id_OrderNavigation.id_ExecutorNavigation)
                 .Where(r => r.id_OrderNavigation.id_Executor == id)
                 .ToListAsync();
         }
@@ -81,11 +81,42 @@ namespace Improvement_API.Controllers
             return NoContent();
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Report>>> SearchReports(int? id_Order, string searchText )
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                return BadRequest("Search text cannot be empty");
+            }
+
+            // Преобразуем поисковый текст в нижний регистр, чтобы поиск был регистронезависимым
+            searchText = searchText.ToLower();
+
+            var matchedReports= await _context.Report
+                .Include(r => r.id_OrderNavigation.id_ExecutorNavigation).Include(r=>r.id_OrderNavigation.id_SupervisorNavigation)
+                .Where(r =>
+                    (r.id_Order==id_Order) && 
+                    (r.Text.ToLower().Contains(searchText) ||
+                    r.Manager_Comment.ToLower().Contains(searchText) ||
+                     r.Header.ToLower().Contains(searchText)  
+                     )
+                )
+                .ToListAsync();
+
+            if (matchedReports == null || !matchedReports.Any())
+            {
+                return NotFound("No reports found matching the search criteria");
+            }
+
+            return Ok(matchedReports);
+        }
+
+
         [HttpGet("order/{id}")]
         public async Task<ActionResult<IEnumerable<Report>>> GetReportsByOrder(int id)
         {
             return await _context.Report
-                .Include(r => r.id_OrderNavigation)
+                .Include(r => r.id_OrderNavigation.id_ExecutorNavigation)
 
                 .Where(r => r.id_Order == id)
                 .ToListAsync();

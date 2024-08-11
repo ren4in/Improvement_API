@@ -165,7 +165,38 @@ namespace Improvement_API.Controllers
             return null;
 
         }
-            private bool UserExists(int id)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<User>>> SearchUsers(string searchText)
+        {
+            if (string.IsNullOrEmpty(searchText))
+            {
+                return BadRequest("Search text cannot be empty");
+            }
+
+            // Преобразуем поисковый текст в нижний регистр, чтобы поиск был регистронезависимым
+            searchText = searchText.ToLower();
+
+            var matchedUsers = await _context.User
+                .Include(u => u.id_RoleNavigation)
+                .Where(u =>
+                   (u.LastName.ToLower() + " " +
+                 u.FirstName.ToLower() + " " +
+                 u.MiddleName.ToLower()).Contains(searchText) ||
+                    u.Login.ToLower().Contains(searchText) ||
+                    u.Phone.ToLower().Contains(searchText) ||
+                    u.id_RoleNavigation.Name.ToLower().Contains(searchText) // Поиск по названию роли
+                )
+                .ToListAsync();
+
+            if (matchedUsers == null || !matchedUsers.Any())
+            {
+                return NotFound("No users found matching the search criteria");
+            }
+
+            return Ok(matchedUsers);
+        }
+
+        private bool UserExists(int id)
         {
             return _context.User.Any(e => e.id_User == id);
         }
